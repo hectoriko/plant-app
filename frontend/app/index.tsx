@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Platform } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, Alert, Platform, ImageBackground } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useCallback } from 'react';
 import axios from 'axios';
 
 // The logo from the previous app
 const PLANTAE_LOGO = require('../assets/images/plantae-logo.png');
+const DEFAULT_PLANT_IMAGE = require('../assets/images/default.jpg');
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api/plants';
 
@@ -74,68 +75,77 @@ export default function HomeScreen() {
   const renderGridItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       style={styles.gridCard}
-      onPress={() => router.push(`/detail/${item._id}`)}
-      activeOpacity={0.7}
+      onPress={() => router.push(`/detail/${item._id}` as any)}
+      activeOpacity={0.9}
     >
       {item.imageUri ? (
-        <Image source={{ uri: item.imageUri }} style={styles.gridImage} />
+        <Image source={{ uri: item.imageUri }} style={styles.cardBgImage} />
       ) : (
-        <Image source={PLANTAE_LOGO} style={[styles.gridImage, styles.plantImageFallback]} />
+        <Image source={DEFAULT_PLANT_IMAGE} style={styles.cardBgImage} />
       )}
-      <Text style={[styles.gridName, item.isDead && styles.deadText]} numberOfLines={1}>{item.name}</Text>
-      <Text style={styles.gridSpecies} numberOfLines={1}>{item.species || 'Unknown'}</Text>
       
-      <View style={styles.gridActions}>
-        <TouchableOpacity style={styles.gridActionBtn} onPress={() => waterPlant(item)}>
-          <Ionicons name="water" size={16} color="#3498db" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.gridActionBtn} onPress={() => toggleDead(item)}>
-          <Ionicons name="skull" size={16} color={item.isDead ? "#e74c3c" : "#9aa89b"} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.gridActionBtn} onPress={() => router.push(`/edit/${item._id}` as any)}>
-          <Ionicons name="pencil" size={16} color="#2ecc71" />
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.gridActionBtn, styles.deleteBtn]} onPress={() => deletePlant(item._id)}>
-          <Ionicons name="trash" size={16} color="#e74c3c" />
-        </TouchableOpacity>
-      </View>
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        style={styles.gridGradient}
+      >
+        <Text style={[styles.gridName, item.isDead && styles.deadText]} numberOfLines={1}>{item.name}</Text>
+        
+        <View style={styles.gridActions}>
+          <TouchableOpacity style={styles.compactActionBtn} onPress={() => waterPlant(item)}>
+            <Ionicons name="water" size={14} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.compactActionBtn} onPress={() => toggleDead(item)}>
+            <Ionicons name="skull" size={14} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.compactActionBtn} onPress={() => router.push(`/edit/${item._id}` as any)}>
+            <Ionicons name="pencil" size={14} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.compactActionBtn, {backgroundColor: 'rgba(231, 76, 60, 0.6)'}]} onPress={() => deletePlant(item._id)}>
+            <Ionicons name="trash" size={14} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 
   const renderItem = ({ item }: { item: any }) => (
     <TouchableOpacity
       style={styles.plantCard}
-      onPress={() => router.push(`/detail/${item._id}`)}
-      activeOpacity={0.7}
+      onPress={() => router.push(`/detail/${item._id}` as any)}
+      activeOpacity={0.9}
     >
-      <View style={styles.plantInfoContainer}>
-        {item.imageUri ? (
-          <Image source={{ uri: item.imageUri }} style={styles.plantImage} />
-        ) : (
-          <Image source={PLANTAE_LOGO} style={[styles.plantImage, styles.plantImageFallback]} />
-        )}
-        <View style={styles.plantInfo}>
-          <Text style={[styles.plantName, item.isDead && styles.deadText]}>{item.name}</Text>
-          <Text style={styles.plantSpecies}>{item.species || 'Unknown species'}</Text>
-          <Text style={styles.plantDate}>Last watered: {new Date(item.lastWatered).toLocaleDateString()}</Text>
-          {item.isDead && <Text style={styles.deadWarning}>💀 Dead</Text>}
+      {item.imageUri ? (
+        <Image source={{ uri: item.imageUri }} style={styles.cardBgImage} />
+      ) : (
+        <Image source={DEFAULT_PLANT_IMAGE} style={styles.cardBgImage} />
+      )}
+
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        style={styles.listGradient}
+      >
+        <View style={styles.listContent}>
+          <View style={styles.mainInfo}>
+            <Text style={[styles.listName, item.isDead && styles.deadText]}>{item.name}</Text>
+            <Text style={styles.listSpecies}>{item.species || 'Unknown species'}</Text>
+          </View>
+          
+          <View style={styles.listActions}>
+            <TouchableOpacity style={styles.circleActionBtn} onPress={() => waterPlant(item)}>
+              <Ionicons name="water" size={18} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.circleActionBtn} onPress={() => toggleDead(item)}>
+              <Ionicons name="skull" size={18} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.circleActionBtn} onPress={() => router.push(`/edit/${item._id}` as any)}>
+              <Ionicons name="pencil" size={18} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.circleActionBtn, {backgroundColor: 'rgba(231, 76, 60, 0.6)'}]} onPress={() => deletePlant(item._id)}>
+              <Ionicons name="trash" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      
-      <View style={styles.actions}>
-        <TouchableOpacity style={[styles.actionBtn, {backgroundColor: '#ebf5fb'}]} onPress={() => waterPlant(item)}>
-          <Text style={[styles.actionText, {color: '#3498db'}]}>Water</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} onPress={() => toggleDead(item)}>
-          <Text style={styles.actionText}>{item.isDead ? 'Revive' : 'Mark Dead'}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} onPress={() => router.push(`/edit/${item._id}` as any)}>
-          <Text style={styles.actionText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionBtn, styles.deleteBtn]} onPress={() => deletePlant(item._id)}>
-          <Text style={styles.actionText}>Delete</Text>
-        </TouchableOpacity>
-      </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 
@@ -205,81 +215,76 @@ const styles = StyleSheet.create({
   },
   plantCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e0ebd8',
-    elevation: 2,
+    borderRadius: 20,
+    marginBottom: 20,
+    height: 200,
+    overflow: 'hidden',
+    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
   },
-  plantInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 15,
+  cardBgImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
   },
-  plantImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30, // Make it circular
+  placeholderBg: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: '#f0f4f1',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   plantImageFallback: {
-    padding: 10,
+    width: 80,
+    height: 80,
+    opacity: 0.3,
     resizeMode: 'contain',
   },
-  plantInfo: {
+  listGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  listContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  mainInfo: {
     flex: 1,
-    marginBottom: 5,
   },
-  plantName: {
-    fontSize: 20,
+  listName: {
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2c3e2f',
+    color: '#ffffff',
   },
-  plantSpecies: {
+  listSpecies: {
     fontSize: 14,
-    color: '#6c8270',
+    color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
-  plantDate: {
-    fontSize: 12,
-    color: '#9aa89b',
-    marginTop: 4,
+  listActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  circleActionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backdropFilter: 'blur(10px)',
   },
   deadText: {
     textDecorationLine: 'line-through',
-    color: '#9aa89b',
-  },
-  deadWarning: {
-    color: '#e74c3c',
-    marginTop: 4,
-    fontWeight: 'bold',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    gap: 10,
-    marginTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f4f1',
-    paddingTop: 12,
-  },
-  actionBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#e8f7ec',
-    borderRadius: 8,
-  },
-  deleteBtn: {
-    backgroundColor: '#ffe8e8',
-  },
-  actionText: {
-    color: '#2ecc71',
-    fontWeight: '600',
+    opacity: 0.6,
   },
   emptyText: {
     textAlign: 'center',
@@ -310,47 +315,43 @@ const styles = StyleSheet.create({
   },
   gridCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 20,
+    height: 180,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#e0ebd8',
     flex: 1,
-    marginHorizontal: 4,
-    alignItems: 'center',
-    elevation: 2,
+    marginHorizontal: 8,
+    overflow: 'hidden',
+    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
-  gridImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#f0f4f1',
-    marginBottom: 12,
+  gridGradient: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    padding: 12,
   },
   gridName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2c3e2f',
+    color: '#ffffff',
+    marginBottom: 8,
     textAlign: 'center',
-  },
-  gridSpecies: {
-    fontSize: 12,
-    color: '#6c8270',
-    marginTop: 4,
-    textAlign: 'center',
+    width: '100%',
   },
   gridActions: {
     flexDirection: 'row',
-    marginTop: 12,
-    gap: 10,
+    justifyContent: 'center',
+    gap: 8,
+    width: '100%',
   },
-  gridActionBtn: {
-    padding: 10,
-    backgroundColor: '#e8f7ec',
-    borderRadius: 20,
+  compactActionBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

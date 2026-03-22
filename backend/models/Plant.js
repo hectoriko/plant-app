@@ -8,6 +8,8 @@ const plantSchema = new mongoose.Schema({
   photos: { type: [String], default: [] }, // Additional photos for the carousel
   lastWatered: { type: Date, default: Date.now },
   wateredDates: { type: [Date], default: [Date.now] }, // History of waterings
+  journal: { type: [{ date: { type: Date, default: Date.now }, note: String }], default: [] }, // Plant journal
+  wateringFrequency: { type: Number, default: 7 }, // Number of days between watering
   isDead: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
