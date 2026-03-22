@@ -8,7 +8,7 @@ import axios from 'axios';
 // The logo from the previous app
 const PLANTAE_LOGO = require('../assets/images/plantae-logo.png');
 
-const API_URL = 'http://192.168.0.27:5000/api/plants';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api/plants';
 
 export default function HomeScreen() {
   const [plants, setPlants] = useState([]);
@@ -34,7 +34,7 @@ export default function HomeScreen() {
     }, [])
   );
 
-  const toggleDead = async (plant) => {
+  const toggleDead = async (plant: any) => {
     try {
       await axios.put(`${API_URL}/${plant._id}`, { ...plant, isDead: !plant.isDead });
       fetchPlants();
@@ -43,7 +43,21 @@ export default function HomeScreen() {
     }
   };
 
-  const deletePlant = async (id) => {
+  const waterPlant = async (plant: any) => {
+    try {
+      const newDate = new Date();
+      await axios.put(`${API_URL}/${plant._id}`, { 
+        ...plant, 
+        lastWatered: newDate,
+        wateredDates: [...(plant.wateredDates || []), newDate]
+      });
+      fetchPlants();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to water plant.');
+    }
+  };
+
+  const deletePlant = async (id: string) => {
     Alert.alert('Delete Plant', 'Are you sure you want to delete this plant?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {
@@ -58,7 +72,11 @@ export default function HomeScreen() {
   };
 
   const renderGridItem = ({ item }: { item: any }) => (
-    <View style={styles.gridCard}>
+    <TouchableOpacity
+      style={styles.gridCard}
+      onPress={() => router.push(`/detail/${item._id}`)}
+      activeOpacity={0.7}
+    >
       {item.imageUri ? (
         <Image source={{ uri: item.imageUri }} style={styles.gridImage} />
       ) : (
@@ -68,21 +86,28 @@ export default function HomeScreen() {
       <Text style={styles.gridSpecies} numberOfLines={1}>{item.species || 'Unknown'}</Text>
       
       <View style={styles.gridActions}>
-        <TouchableOpacity style={styles.gridActionBtn} onPress={() => toggleDead(item)}>
-          <Ionicons name="water" size={16} color={item.isDead ? "#e74c3c" : "#2ecc71"} />
+        <TouchableOpacity style={styles.gridActionBtn} onPress={() => waterPlant(item)}>
+          <Ionicons name="water" size={16} color="#3498db" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.gridActionBtn} onPress={() => router.push(`/edit/${item._id}`)}>
+        <TouchableOpacity style={styles.gridActionBtn} onPress={() => toggleDead(item)}>
+          <Ionicons name="skull" size={16} color={item.isDead ? "#e74c3c" : "#9aa89b"} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.gridActionBtn} onPress={() => router.push(`/edit/${item._id}` as any)}>
           <Ionicons name="pencil" size={16} color="#2ecc71" />
         </TouchableOpacity>
         <TouchableOpacity style={[styles.gridActionBtn, styles.deleteBtn]} onPress={() => deletePlant(item._id)}>
           <Ionicons name="trash" size={16} color="#e74c3c" />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.plantCard}>
+    <TouchableOpacity
+      style={styles.plantCard}
+      onPress={() => router.push(`/detail/${item._id}`)}
+      activeOpacity={0.7}
+    >
       <View style={styles.plantInfoContainer}>
         {item.imageUri ? (
           <Image source={{ uri: item.imageUri }} style={styles.plantImage} />
@@ -98,17 +123,20 @@ export default function HomeScreen() {
       </View>
       
       <View style={styles.actions}>
+        <TouchableOpacity style={[styles.actionBtn, {backgroundColor: '#ebf5fb'}]} onPress={() => waterPlant(item)}>
+          <Text style={[styles.actionText, {color: '#3498db'}]}>Water</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.actionBtn} onPress={() => toggleDead(item)}>
           <Text style={styles.actionText}>{item.isDead ? 'Revive' : 'Mark Dead'}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionBtn} onPress={() => router.push(`/edit/${item._id}`)}>
+        <TouchableOpacity style={styles.actionBtn} onPress={() => router.push(`/edit/${item._id}` as any)}>
           <Text style={styles.actionText}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.actionBtn, styles.deleteBtn]} onPress={() => deletePlant(item._id)}>
           <Text style={styles.actionText}>Delete</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (

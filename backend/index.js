@@ -26,6 +26,16 @@ app.get("/api/plants", async (req, res) => {
   }
 });
 
+app.get("/api/plants/:id", async (req, res) => {
+  try {
+    const plant = await Plant.findById(req.params.id);
+    if (!plant) return res.status(404).json({ error: "Plant not found" });
+    res.json(plant);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.post("/api/plants", async (req, res) => {
   try {
     const newPlant = new Plant(req.body);

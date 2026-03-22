@@ -15,9 +15,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="index" options={{ title: 'Plantae', headerStyle: { backgroundColor: '#242424' }, headerTintColor: '#fff' }} />
-        <Stack.Screen name="add" options={{ title: 'Add Plant', presentation: 'modal', headerStyle: { backgroundColor: '#242424' }, headerTintColor: '#fff' }} />
-        <Stack.Screen name="edit/[id]" options={{ title: 'Edit Plant', presentation: 'modal', headerStyle: { backgroundColor: '#242424' }, headerTintColor: '#fff' }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="add" options={{ title: 'Add Plant', presentation: 'modal', headerStyle: { backgroundColor: '#ffffff' }, headerTintColor: '#2c3e2f' }} />
+        <Stack.Screen name="edit/[id]" options={{ title: 'Edit Plant', presentation: 'modal', headerStyle: { backgroundColor: '#ffffff' }, headerTintColor: '#2c3e2f' }} />
       </Stack>
       <StatusBar style="light" />
     </ThemeProvider>

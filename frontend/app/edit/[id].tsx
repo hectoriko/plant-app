@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.0.27:5000/api/plants';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api/plants';
 
 export default function EditPlantScreen() {
   const { id } = useLocalSearchParams();
@@ -12,10 +12,11 @@ export default function EditPlantScreen() {
   
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('');
+  const [description, setDescription] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [isDead, setIsDead] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState(false);  
 
   useEffect(() => {
     const fetchPlant = async () => {
@@ -25,6 +26,7 @@ export default function EditPlantScreen() {
         if (plant) {
           setName(plant.name);
           setSpecies(plant.species || '');
+          setDescription(plant.description || '');
           setImageUri(plant.imageUri || null);
           setIsDead(plant.isDead);
         } else {
@@ -83,7 +85,7 @@ export default function EditPlantScreen() {
 
     setSaving(true);
     try {
-      await axios.put(`${API_URL}/${id}`, { name, species, imageUri, isDead });
+      await axios.put(`${API_URL}/${id}`, { name, species, description, imageUri, isDead });
       router.back();
     } catch (error) {
       Alert.alert('Error', 'Failed to update plant');
@@ -115,6 +117,15 @@ export default function EditPlantScreen() {
         value={species}
         onChangeText={setSpecies}
         placeholderTextColor="#666"
+      />
+
+      <Text style={styles.label}>Description (optional)</Text>
+      <TextInput
+        style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+        value={description}
+        onChangeText={setDescription}
+        placeholderTextColor="#666"
+        multiline
       />
 
       <Text style={styles.label}>Photo (optional)</Text>
@@ -163,102 +174,133 @@ export default function EditPlantScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#242424',
+    padding: 24,
+    backgroundColor: '#f5f9f6',
   },
   center: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   label: {
-    color: 'rgba(255, 255, 255, 0.87)',
+    color: '#2c3e2f',
     fontSize: 16,
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: 'bold',
   },
   input: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 8,
-    padding: 12,
-    color: '#fff',
+    borderColor: '#e0ebd8',
+    borderRadius: 12,
+    padding: 16,
+    color: '#2c3e2f',
     fontSize: 16,
     marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   imageSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
     gap: 15,
   },
   imagePlaceholder: {
     width: 80,
     height: 80,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#e0ebd8',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   previewImage: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   imagePlaceholderText: {
-    color: '#666',
+    color: '#9aa89b',
     fontSize: 12,
+    fontWeight: '500',
   },
   imageButtons: {
     flex: 1,
     gap: 10,
   },
   iconButton: {
-    backgroundColor: '#1a1a1a',
-    padding: 10,
-    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    padding: 12,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#e0ebd8',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   iconButtonText: {
-    color: '#646cff',
-    fontWeight: '500',
+    color: '#2ecc71',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   statusToggle: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#e8f7ec',
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#333',
-    marginBottom: 20,
+    borderColor: '#2ecc71',
+    marginBottom: 24,
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   statusToggleDead: {
-    borderColor: '#ff4444',
-    backgroundColor: '#3a1a1a',
+    borderColor: '#e74c3c',
+    backgroundColor: '#ffe8e8',
   },
   statusText: {
-    color: '#4ade80',
+    color: '#2ecc71',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   statusTextDead: {
-    color: '#ff4444',
+    color: '#e74c3c',
   },
   button: {
-    backgroundColor: '#646cff',
+    backgroundColor: '#2ecc71',
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
+    marginTop: 10,
+    elevation: 4,
+    shadowColor: '#2ecc71',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   buttonDisabled: {
-    opacity: 0.7,
+    backgroundColor: '#a8e6cf',
+    elevation: 0,
+    shadowOpacity: 0,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
 });
