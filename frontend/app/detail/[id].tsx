@@ -5,7 +5,8 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api/plants';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api';
+const API_URL = `${BASE_URL}/plants`;
 const PLANTAE_LOGO = require('../../assets/images/plantae-logo.png');
 const DEFAULT_PLANT_IMAGE = require('../../assets/images/default.jpg');
 

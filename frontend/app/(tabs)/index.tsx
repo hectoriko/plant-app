@@ -5,11 +5,12 @@ import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-// The logo from the previous app
-const PLANTAE_LOGO = require('../assets/images/plantae-logo.png');
-const DEFAULT_PLANT_IMAGE = require('../assets/images/default.jpg');
+// Adjusted paths for (tabs) folder
+const PLANTAE_LOGO = require('../../assets/images/plantae-logo.png');
+const DEFAULT_PLANT_IMAGE = require('../../assets/images/default.jpg');
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api/plants';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.27:5000/api';
+const API_URL = `${BASE_URL}/plants`;
 
 export default function HomeScreen() {
   const [plants, setPlants] = useState([]);
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 100,
     alignSelf: 'center',
     backgroundColor: '#2ecc71',
     paddingHorizontal: 24,
